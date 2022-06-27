@@ -1,5 +1,6 @@
 /* Dependencies */
 import { v4 as UUIDV4 } from "uuid";
+import * as bcrypt from 'bcrypt';
 
 /* Models */
 import UserProfile from "../user-profile/user-profile.model";
@@ -22,6 +23,8 @@ import {
 } from "sequelize-typescript";
 import { STRING } from "sequelize";
 import { userScopes } from "./user.scopes";
+import { UserChanges } from "./user.interface";
+import { UserRole } from "./user.enum";
 
 @Table({
   timestamps: true,
@@ -68,12 +71,27 @@ export default class User extends Model {
   email!: string;
 
   @AllowNull(false)
-  @Column(STRING(128))
+  @Column({
+    type: STRING(128),
+    set(value: string) {
+      const salt = bcrypt.genSaltSync(10);
+      const hash = value ? bcrypt.hashSync(value, salt) : '';
+
+      this.setDataValue('password', hash);
+    },
+    get() {
+      return this.getDataValue('password');
+    }
+  })
   password!: string;
 
   @Default("user")
   @Column(DataType.ENUM("admin", "moderator", "user"))
-  role!: string;
+  role!: UserRole;
+
+  @Default({})
+  @Column(DataType.JSONB)
+  changes: UserChanges;
 
   /** ASSOCIATIONS */
 
