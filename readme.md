@@ -1,0 +1,1 @@
+## Search by json with sequelize
