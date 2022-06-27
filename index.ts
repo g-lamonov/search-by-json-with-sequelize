@@ -1,8 +1,10 @@
 import { Sequelize } from "sequelize-typescript";
-import { Op, WhereOptions, } from "sequelize";
+import { Op, where, literal } from "sequelize";
 
 import UserProfile from "./models/user-profile/user-profile.model";
 import User from "./models/user/user.model";
+
+const allEqual = stringifiedStrings => stringifiedStrings.every(str => str === stringifiedStrings[0])
 
 const sequelize = new Sequelize({
   database: "dev",
@@ -17,56 +19,95 @@ async function main() {
   try {
     await sequelize.sync();
 
-    const word = 'Ivan';
-    const firstResult = await UserProfile.findAll({
+    const firstName = 'Ivan';
+    const userFirstResult = await UserProfile.findAll({
       include: [{
         model: User,
         where: {
           changes: {
-            '"firstName"': word
+            '"firstName"': firstName
           }
         }
       }],
     })
 
-    const secondResult = await UserProfile.findAll({
+    const userSecondResult = await UserProfile.findAll({
       include: [{
         model: User,
         where: {
-          'changes.firstName': word
+          'changes.firstName': firstName
         }
       }],
     })
 
-    const thirdResult = await UserProfile.findAll({
+    const userThirdResult = await UserProfile.findAll({
       include: [{
         model: User,
         where: {
           changes: {
-            firstName: word
+            firstName
           }
         }
       }],
     })
 
-    const firstResultStringified = JSON.stringify(firstResult, null, 1);
-    const secondResultStringified = JSON.stringify(secondResult, null, 1);
-    const thirdResultStringified = JSON.stringify(thirdResult, null, 1);
+    const userFirstResultStringified = JSON.stringify(userFirstResult, null, 1);
+    const userSecondResultStringified = JSON.stringify(userSecondResult, null, 1);
+    const userThirdResultStringified = JSON.stringify(userThirdResult, null, 1);
 
-    const stringifiedStrings = [
-      firstResultStringified,
-      secondResultStringified,
-      thirdResultStringified
+    const firstStringifiedStrings = [
+      userFirstResultStringified,
+      userSecondResultStringified,
+      userThirdResultStringified
     ]
   
-    const allEqual = stringifiedStrings => stringifiedStrings.every(str => str === stringifiedStrings[0])
-    const areAllTheSame = allEqual(stringifiedStrings);
+    let areAllTheSame = allEqual(firstStringifiedStrings);
 
     if (areAllTheSame) {
-      console.log('The search is correct')
+      console.log('FirstName search is correct')
     }
 
+    const country = 'Brazil';
+    const userFourthResult = await UserProfile.findAll({
+      include: [{
+        model: User,
+        where: {
+            changes: {
+              '"location"': { 
+                  '"country"': country
+              },
+            },
+        },
+      }],
+    })
 
+    const userFifthResult = await UserProfile.findAll({
+      include: [{
+        model: User,
+        where: {
+            changes: {
+              location: { 
+                  country
+              },
+            },
+        },
+      }],
+    })
+
+    const userFourthResultStringified = JSON.stringify(userFourthResult, null, 1);
+    const userFifthResultStringified = JSON.stringify(userFifthResult, null, 1);
+
+    const secondStringifiedStrings = [
+      userFourthResultStringified,
+      userFifthResultStringified,
+    ]
+
+    areAllTheSame = allEqual(secondStringifiedStrings);
+
+    if (areAllTheSame) {
+      console.log('Сountry search is correct')
+    }
+  
   } catch (err) {
     console.log(err);
   }

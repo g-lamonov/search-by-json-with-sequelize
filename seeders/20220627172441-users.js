@@ -17,7 +17,10 @@ module.exports = {
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10), null),
         changes: JSON.stringify({
           firstName: 'Ivan',
-          lastName: 'Ivanov'
+          lastName: 'Ivanov',
+          location: {
+            country: 'Russia'
+          }
         }),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -30,7 +33,10 @@ module.exports = {
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10), null),
         changes: JSON.stringify({
           firstName: 'Janez',
-          lastName: 'Novak'
+          lastName: 'Novak',
+          location: {
+            country: 'Brazil'
+          }
         }),
         createdAt: new Date(),
         updatedAt: new Date(),
