@@ -107,7 +107,21 @@ async function main() {
     if (areAllTheSame) {
       console.log('Сountry search is correct')
     }
+
+    const userSixthResult = await UserProfile.findAll({
+      where: {
+        [Op.and]: [
+          literal(`("owner"."changes"#>>'{firstName}') = '${firstName}'`)
+        ]
+      },
+      include: [{
+        model: User,
+      }],
+    })
   
+    const userSixthResultStringified = JSON.stringify(userSixthResult, null, 1);
+
+    console.log(userSixthResultStringified);
   } catch (err) {
     console.log(err);
   }
